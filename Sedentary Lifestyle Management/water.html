@@ -67,125 +67,109 @@
         </div>
     </div>
 
-    <script>
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-            document.getElementById("overlay").style.display = "block";
-        }
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-            document.getElementById("overlay").style.display = "none";
-        }
-
-        const waterAmount = document.getElementById('waterAmount');
-        const addBtn = document.getElementById('addWaterBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const recordsTableBody = document.querySelector('#recordsTable tbody');
-        const summary = document.getElementById('summary');
-        const alertBox = document.getElementById('alertBox');
-        const cupWater = document.getElementById('cupWater');
-
-// 讀取飲水紀錄
-let records = JSON.parse(localStorage.getItem('waterRecords') || '[]');
-
-// ⬇️ 讀取體重（假設存成 { weight: 50 } 這樣）
-let profile = JSON.parse(localStorage.getItem('profile') || '{}');
-
-// ⬇️ 設定每日目標
-let dailyGoal = 2000;  // 預設 2000 c.c.
-
-if (profile.weight && Number(profile.weight) > 0) {
-    dailyGoal = Number(profile.weight) * 30;  
-}
-
-// 計算今日飲水總量
-function getTodayTotal() {
-    const today = new Date().toLocaleDateString();
-    return records
-        .filter(r => r.date === today)
-        .reduce((a, b) => a + b.amount, 0);
-}
-
-// 更新水杯 + 是否達標
-function updateCup() {
-    const total = getTodayTotal();
-    const ratio = Math.min(total / dailyGoal, 1);
-    const height = 100 - ratio * 100;
-    cupWater.style.height = height + "%";
-
-    // 顯示已達標
-    const alertBox = document.getElementById('alertBox');
-    if (total >= dailyGoal) {
-        alertBox.innerHTML = `<span class="badge ok">🎉 本日飲水已達標！</span>`;
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+        document.getElementById("overlay").style.display = "block";
     }
-}
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+        document.getElementById("overlay").style.display = "none";
+    }
 
+    const waterAmount = document.getElementById('waterAmount');
+    const addBtn = document.getElementById('addWaterBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const recordsTableBody = document.querySelector('#recordsTable tbody');
+    const summary = document.getElementById('summary');
+    const alertBox = document.getElementById('alertBox');
+    const cupWater = document.getElementById('cupWater');
 
-        function updateCup() {
-            const total = getTodayTotal();
-            const ratio = Math.min(total / dailyGoal, 1);
-            const height = 100 - ratio * 100;
-            cupWater.style.height = height + "%";
+    // 讀取歷史紀錄
+    let records = JSON.parse(localStorage.getItem('waterRecords') || '[]');
+
+    // 讀取體重
+    let profile = JSON.parse(localStorage.getItem('profile') || '{}');
+
+    // 設定每日目標
+    let dailyGoal = 2000;
+    if (profile.weight && Number(profile.weight) > 0) {
+        dailyGoal = Number(profile.weight) * 30;
+    }
+
+    // 計算今日攝取
+    function getTodayTotal() {
+        const today = new Date().toLocaleDateString();
+        return records
+            .filter(r => r.date === today)
+            .reduce((a, b) => a + b.amount, 0);
+    }
+
+    // 更新水杯 + 達標提示
+    function updateCup() {
+        const total = getTodayTotal();
+        const ratio = Math.min(total / dailyGoal, 1);
+        const height = 100 - ratio * 100;
+        cupWater.style.height = height + "%";
+
+        if (total >= dailyGoal) {
+            alertBox.innerHTML = `<span class="badge ok">🎉 本日飲水已達標！</span>`;
         }
+    }
 
-        addBtn.addEventListener('click', () => {
-            alertBox.innerHTML = "";
-            const amount = Number(waterAmount.value);
-            if (amount <= 0) return alert("Please enter a valid amount.");
+    addBtn.addEventListener('click', () => {
+        alertBox.innerHTML = "";
+        const amount = Number(waterAmount.value);
+        if (amount <= 0) return alert("Please enter a valid amount.");
 
-            const item = {
-                id: Date.now(),
-                amount,
-                date: new Date().toLocaleDateString()
-            };
-
-            records.unshift(item);
-            localStorage.setItem('waterRecords', JSON.stringify(records));
-            waterAmount.value = "";
-            render();
-
-            alertBox.innerHTML = `<span class="badge ok">+${amount} ml</span>`;
-        });
-
-        clearBtn.addEventListener('click', () => {
-            if (!confirm("Clear all history?")) return;
-            records = [];
-            localStorage.removeItem('waterRecords');
-            render();
-            alertBox.innerHTML = "";
-        });
-
-        function render() {
-            recordsTableBody.innerHTML = "";
-            if (records.length === 0) {
-                summary.style.display = "block";
-            } else {
-                summary.style.display = "none";
-            }
-
-            for (const r of records) {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${r.date}</td>
-                    <td>${r.amount}</td>
-                    <td style="text-align:center">
-                        <button class="danger-btn small" onclick="deleteRecord(${r.id})">×</button>
-                    </td>
-                `;
-                recordsTableBody.appendChild(tr);
-            }
-
-            updateCup();
-        }
-
-        window.deleteRecord = function(id) {
-            records = records.filter(x => x.id !== id);
-            localStorage.setItem('waterRecords', JSON.stringify(records));
-            render();
+        const item = {
+            id: Date.now(),
+            amount,
+            date: new Date().toLocaleDateString()
         };
 
-        
+        records.unshift(item);
+        localStorage.setItem('waterRecords', JSON.stringify(records));
+        waterAmount.value = "";
         render();
-    </script>
+
+        alertBox.innerHTML = `<span class="badge ok">+${amount} ml</span>`;
+    });
+
+    clearBtn.addEventListener('click', () => {
+        if (!confirm("Clear all history?")) return;
+        records = [];
+        localStorage.removeItem('waterRecords');
+        alertBox.innerHTML = "";
+        render();
+    });
+
+    function render() {
+        recordsTableBody.innerHTML = "";
+        summary.style.display = records.length === 0 ? "block" : "none";
+
+        for (const r of records) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${r.date}</td>
+                <td>${r.amount}</td>
+                <td style="text-align:center">
+                    <button class="danger-btn small" onclick="deleteRecord(${r.id})">×</button>
+                </td>
+            `;
+            recordsTableBody.appendChild(tr);
+        }
+
+        updateCup();
+    }
+
+    window.deleteRecord = function (id) {
+        records = records.filter(x => x.id !== id);
+        localStorage.setItem('waterRecords', JSON.stringify(records));
+        render();
+    };
+
+    render();
+</script>
 </body>
 </html>
