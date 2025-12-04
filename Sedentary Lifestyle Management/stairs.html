@@ -9,9 +9,10 @@
         .header-bar { background-color: transparent; }
         .container { padding: 20px; font-family: Arial, sans-serif; }
         #stairs-display { font-size: 24px; margin: 10px 0; }
-        input { padding: 5px; margin-right: 10px; }
-        button { padding: 5px 10px; margin-right: 5px; }
+        input { padding: 5px; margin-right: 10px; margin-top: 5px; }
+        button { padding: 5px 10px; margin-right: 5px; margin-top: 5px; }
         .secondary { background-color: #ccc; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -45,7 +46,12 @@
 
         <!-- 輸入樓層自動算樓梯 -->
         <div style="margin-top: 15px;">
-            <input type="number" id="floor-input" placeholder="Enter floors" min="0">
+            <label for="floor-input">Enter floors:</label>
+            <input type="number" id="floor-input" placeholder="Floors" min="0">
+
+            <label for="stairs-input">Stairs per floor:</label>
+            <input type="number" id="stairs-input" placeholder="Stairs per floor" min="1" value="20">
+
             <button id="calculate-btn">Calculate Stairs</button>
         </div>
     </div>
@@ -61,14 +67,15 @@
             document.getElementById("overlay").style.display = "none"; 
         }
 
-        const stairsPerFloor = 20; // 每層樓梯數
         let floors = 0;
+        let stairsPerFloor = 20;
 
         const addBtn = document.getElementById('add-floor-btn');
         const resetBtn = document.getElementById('reset-floor-btn');
         const display = document.getElementById('stairs-display');
 
         const input = document.getElementById('floor-input');
+        const stairsInput = document.getElementById('stairs-input');
         const calculateBtn = document.getElementById('calculate-btn');
 
         // 更新顯示
@@ -91,8 +98,8 @@
 
         // 輸入樓層自動算樓梯
         calculateBtn.addEventListener('click', () => {
-            const inputFloors = parseInt(input.value) || 0;
-            floors = inputFloors;
+            floors = parseInt(input.value) || 0;
+            stairsPerFloor = parseInt(stairsInput.value) || 20;
             updateDisplay();
         });
 
