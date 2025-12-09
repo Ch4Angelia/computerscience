@@ -16,10 +16,12 @@
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <a href="index.html" style="color: white;">📊 Dashboard</a>
         <a href="profile.html">👤 User Profile</a>
+        <a href="walking.html">👣 Walking</a>
         <a href="water.html">💧 Water Tracker</a>
         <a href="sedentary.html">🪑 Sedentary Timer</a>
         <a href="stairs.html">🪜 Stairs Tracker</a>
         <a href="sleep.html">😴 Sleep Manager</a>
+        <a href="exercise.html">🏃 Exercise</a>
     </div>
 
     <div class="header-bar">
@@ -32,12 +34,17 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>💧 Water Today</h3>
+                <h3>👣 Steps</h3>
+                <div class="stat-number" id="display-steps">0</div>
+                <span>steps</span>
+            </div>
+            <div class="stat-card">
+                <h3>💧 Water</h3>
                 <div class="stat-number" id="display-water">0</div>
                 <span>mL</span>
             </div>
             <div class="stat-card">
-                <h3>😴 Last Sleep</h3>
+                <h3>😴 Sleep</h3>
                 <div class="stat-number" id="display-sleep">--</div>
                 <span>hours</span>
             </div>
@@ -67,6 +74,9 @@
         }
 
         window.onload = function() {
+            const steps = localStorage.getItem('w_steps') || 0;
+            document.getElementById('display-steps').textContent = Number(steps).toLocaleString();
+
             const water = localStorage.getItem('totalWater') || 0;
             document.getElementById('display-water').textContent = water;
 

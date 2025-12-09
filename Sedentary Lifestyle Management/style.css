@@ -114,3 +114,33 @@ th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+.walk-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; text-align: center;
+}
+.walk-card {
+    background: #f0f4f8; padding: 15px 5px; border-radius: 10px; border: 1px solid #d9e2ec;
+}
+.walk-val { font-size: 1.4em; font-weight: bold; color: #2c3e50; }
+.walk-label { font-size: 0.8em; color: #666; margin-top: 5px; }
+
+.c-blue { color: #3498db; }
+.c-green { color: #27ae60; }
+.c-orange { color: #e67e22; }
+.c-purple { color: #9b59b6; }
+
+.input-section {
+    background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;
+    text-align: center; border-left: 5px solid #ccc;
+}
+.border-blue { border-left-color: #3498db; }
+.border-purple { border-left-color: #9b59b6; }
+.input-section h3 { margin-top: 0; font-size: 1.1em; }
+.input-row { margin-bottom: 10px; display: flex; justify-content: center; gap: 5px; }
+.btn-quick { padding: 5px 10px; font-size: 0.85em; }
+
+.exercise-item {
+    background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 8px;
+    margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+}
+.exercise-icon { font-size: 1.5em; margin-right: 10px; }

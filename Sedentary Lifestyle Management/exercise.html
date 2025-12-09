@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .header-bar { background-color: transparent; }
+    </style>
+</head>
+<body>
+    <div id="overlay" onclick="closeNav()"></div>
+    <div id="toast"></div>
+
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="profile.html">👤 User Profile</a>
+        <a href="walking.html">👣 Walking</a>
+        <a href="water.html">💧 Water Tracker</a>
+        <a href="sedentary.html">🪑 Sedentary Timer</a>
+        <a href="stairs.html">🪜 Stairs Tracker</a>
+        <a href="sleep.html">😴 Sleep Manager</a>
+        <a href="exercise.html" style="color: white;">🏃 Exercise</a>
+    </div>
+
+    <div class="header-bar">
+        <span class="menu-icon" onclick="openNav()">&#9776;</span>
+    </div>
+
+    <div class="container" style="margin-top: 0;">
+        <h2>🏃 Exercise Tracker</h2>
+        
+        <label>Activity Type:</label>
+        <select id="ex-type">
+            <option value="Running">🏃 Running</option>
+            <option value="Cycling">🚴 Cycling</option>
+            <option value="Gym/Weights">🏋️ Gym / Weights</option>
+            <option value="Yoga">🧘 Yoga</option>
+            <option value="Swimming">🏊 Swimming</option>
+            <option value="Walking">🚶 Walking</option>
+            <option value="Other">⚡ Other</option>
+        </select>
+
+        <div class="stats-grid" style="margin-top:0; grid-template-columns: 1fr 1fr;">
+            <div>
+                <label>Duration (min):</label>
+                <input type="number" id="ex-duration" placeholder="e.g. 30">
+            </div>
+            <div>
+                <label>Calories (kcal):</label>
+                <input type="number" id="ex-calories" placeholder="e.g. 200">
+            </div>
+        </div>
+
+        <button onclick="addExercise()">Add Workout</button>
+
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
+        <h3>Recent Activities</h3>
+        <div id="exercise-list">
+        </div>
+        
+        <div style="text-align:center; margin-top:20px;">
+            <button onclick="clearExercises()" class="danger-btn small">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
+        function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
+        function showToast(msg) {
+            const t = document.getElementById("toast"); t.textContent = msg; t.className = "show";
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        }
+
+        let exercises = JSON.parse(localStorage.getItem('exerciseRecords') || '[]');
+        
+        renderList();
+
+        function addExercise() {
+            const type = document.getElementById('ex-type').value;
+            const duration = document.getElementById('ex-duration').value;
+            const calories = document.getElementById('ex-calories').value;
+
+            if(!duration || duration <= 0) return showToast('Please enter a valid duration.');
+
+            const record = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString(), 
+                type: type,
+                duration: duration,
+                calories: calories || 0 
+            };
+
+            exercises.unshift(record); 
+            localStorage.setItem('exerciseRecords', JSON.stringify(exercises));
+            
+            document.getElementById('ex-duration').value = '';
+            document.getElementById('ex-calories').value = '';
+            
+            renderList();
+            showToast('Workout Added');
+        }
+
+        function renderList() {
+            const list = document.getElementById('exercise-list');
+            list.innerHTML = ''; 
+
+            if(exercises.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#888;">No workouts yet. Get moving!</p>';
+                return;
+            }
+
+            exercises.forEach(ex => {
+                const item = document.createElement('div');
+                item.className = 'exercise-item'; 
+                
+                let icon = '🏃';
+                if(ex.type === 'Cycling') icon = '🚴';
+                if(ex.type === 'Gym/Weights') icon = '🏋️';
+                if(ex.type === 'Swimming') icon = '🏊';
+                if(ex.type === 'Yoga') icon = '🧘';
+                if(ex.type === 'Walking') icon = '🚶';
+                if(ex.type === 'Other') icon = '⚡';
+
+                item.innerHTML = `
+                    <div style="display:flex; align-items:center;">
+                        <span class="exercise-icon">${icon}</span>
+                        <div>
+                            <strong>${ex.type}</strong><br>
+                            <small style="color:#666;">${ex.date}</small>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-weight:bold; color:#007bff;">${ex.duration} min</div>
+                        <small style="color:#666;">${ex.calories} kcal</small>
+                    </div>
+                    <div style="margin-left:10px;">
+                         <button onclick="deleteExercise(${ex.id})" class="danger-btn small" style="padding:2px 6px;">×</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        window.deleteExercise = function(id) {
+            exercises = exercises.filter(e => e.id !== id);
+            localStorage.setItem('exerciseRecords', JSON.stringify(exercises));
+            renderList();
+        }
+
+        function clearExercises() {
+            if(confirm('Clear all exercise history?')) {
+                exercises = [];
+                localStorage.removeItem('exerciseRecords');
+                renderList();
+                showToast('History Cleared');
+            }
+        }
+    </script>
+</body>
+</html>

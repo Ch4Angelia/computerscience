@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walking Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .header-bar { background-color: transparent; }
+        .container { padding: 20px; font-family: Arial, sans-serif; }
+        input { padding: 8px; width: 80px; }
+    </style>
+</head>
+<body>
+    <div id="overlay" onclick="closeNav()"></div>
+    <div id="toast"></div>
+
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="profile.html">👤 User Profile</a>
+        <a href="walking.html" style="color: white;">👣 Walking</a>
+        <a href="water.html">💧 Water Tracker</a>
+        <a href="sedentary.html">🪑 Sedentary Timer</a>
+        <a href="stairs.html">🪜 Stairs Tracker</a>
+        <a href="sleep.html">😴 Sleep Manager</a>
+        <a href="exercise.html">🏃 Exercise</a>
+    </div>
+
+    <div class="header-bar">
+        <span class="menu-icon" onclick="openNav()">&#9776;</span>
+    </div>
+
+    <div class="container">
+        <h2>👣 Walking Tracker</h2>
+        <p style="color:#666; font-size:0.9em; text-align:center;">
+            Track by Steps OR Time. Total calories calculated automatically.
+        </p>
+
+        <div class="walk-stats">
+            <div class="walk-card">
+                <div id="d-steps" class="walk-val c-blue">0</div>
+                <div class="walk-label">Total Steps</div>
+            </div>
+            <div class="walk-card">
+                <div id="d-time" class="walk-val c-purple">0</div>
+                <div class="walk-label">Total Mins</div>
+            </div>
+            <div class="walk-card">
+                <div id="d-dist" class="walk-val c-green">0.0</div>
+                <div class="walk-label">Km</div>
+            </div>
+            <div class="walk-card">
+                <div id="d-cal" class="walk-val c-orange">0</div>
+                <div class="walk-label">Kcal</div>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
+        <div class="input-section border-blue">
+            <h3>👟 Add by Steps</h3>
+            <div class="input-row">
+                <input type="number" id="in-steps" placeholder="Steps">
+                <button onclick="addBySteps()">Add</button>
+            </div>
+            <div>
+                <button class="secondary btn-quick" onclick="quickSteps(1000)">+1k</button>
+                <button class="secondary btn-quick" onclick="quickSteps(3000)">+3k</button>
+                <button class="secondary btn-quick" onclick="quickSteps(5000)">+5k</button>
+            </div>
+        </div>
+
+        <div class="input-section border-purple">
+            <h3>⏱️ Add by Time</h3>
+            <div class="input-row">
+                <input type="number" id="in-time" placeholder="Mins">
+                <button onclick="addByTime()">Add</button>
+            </div>
+            <div>
+                <button class="secondary btn-quick" onclick="quickTime(15)">+15m</button>
+                <button class="secondary btn-quick" onclick="quickTime(30)">+30m</button>
+                <button class="secondary btn-quick" onclick="quickTime(60)">+1h</button>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button id="reset-btn" class="danger-btn small">Reset All</button>
+        </div>
+    </div>
+
+    <script>
+        function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
+        function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
+        function showToast(msg) {
+            const t = document.getElementById("toast"); t.textContent = msg; t.className = "show";
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        }
+
+        let totSteps = parseInt(localStorage.getItem('w_steps')) || 0;
+        let totTime = parseInt(localStorage.getItem('w_time')) || 0;
+        let totDist = parseFloat(localStorage.getItem('w_dist')) || 0;
+        let totCal = parseFloat(localStorage.getItem('w_cal')) || 0;
+
+        const weight = Number(localStorage.getItem('profileWeight')) || 70;
+        const height = Number(localStorage.getItem('profileHeight')) || 170;
+
+        const uiSteps = document.getElementById('d-steps');
+        const uiTime = document.getElementById('d-time');
+        const uiDist = document.getElementById('d-dist');
+        const uiCal = document.getElementById('d-cal');
+
+        function updateUI() {
+            uiSteps.textContent = totSteps.toLocaleString();
+            uiTime.textContent = totTime;
+            uiDist.textContent = totDist.toFixed(2);
+            uiCal.textContent = Math.round(totCal);
+
+            localStorage.setItem('w_steps', totSteps);
+            localStorage.setItem('w_time', totTime);
+            localStorage.setItem('w_dist', totDist);
+            localStorage.setItem('w_cal', totCal);
+        }
+
+        function addBySteps() {
+            const val = parseInt(document.getElementById('in-steps').value);
+            processSteps(val);
+            document.getElementById('in-steps').value = '';
+        }
+
+        function quickSteps(val) { processSteps(val); }
+
+        function processSteps(s) {
+            if(!s || s <= 0) return showToast('Invalid steps');
+            
+            const strideM = (height * 0.414) / 100;
+            const distKm = (s * strideM) / 1000;
+            const cal = s * 0.04 * (weight / 70);
+
+            totSteps += s;
+            totDist += distKm;
+            totCal += cal;
+            
+            updateUI();
+            showToast(`Added ${s} steps`);
+        }
+
+        function addByTime() {
+            const val = parseInt(document.getElementById('in-time').value);
+            processTime(val);
+            document.getElementById('in-time').value = '';
+        }
+
+        function quickTime(m) { processTime(m); }
+
+        function processTime(m) {
+            if(!m || m <= 0) return showToast('Invalid minutes');
+
+            const distKm = m * 0.08;
+            const cal = 0.0175 * 3.5 * weight * m;
+
+            totTime += m;
+            totDist += distKm;
+            totCal += cal;
+
+            updateUI();
+            showToast(`Added ${m} mins`);
+        }
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            if(confirm('Reset all walking data?')) {
+                totSteps = 0; totTime = 0; totDist = 0; totCal = 0;
+                updateUI();
+                showToast('Reset successful');
+            }
+        });
+
+        updateUI();
+    </script>
+</body>
+</html>
