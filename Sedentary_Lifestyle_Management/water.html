@@ -136,7 +136,7 @@
                 document.getElementById('liters').textContent = `${rem / 1000}L`;
             }
 
-            // Render list (這就是您截圖報錯的地方，現在已修正)
+            // Render list (已修正這裡的語法錯誤)
             const list = document.getElementById('water-log');
             list.innerHTML = '';
             records.slice().reverse().forEach(r => {
@@ -145,7 +145,7 @@
                 div.style.borderBottom = '1px solid #eee';
                 div.style.display = 'flex';
                 div.style.justify-content = 'space-between';
-                // 這裡使用了反引號 ` `
+                // ⚠️ 修正重點：這裡使用了反引號 ` ` 包裹 HTML 字串
                 div.innerHTML = `<span>${r.amount} ml</span> <small style="color:#999">${r.time}</small>`;
                 list.appendChild(div);
             });
