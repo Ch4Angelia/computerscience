@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <style>.header-bar { background-color: transparent; }</style>
 </head>
 <body>
     <div id="overlay" onclick="closeNav()"></div>
@@ -17,7 +16,7 @@
         <a href="profile.html">👤 User Profile</a>
         <a href="diet.html">🍎 Diet Tracker</a>
         <a href="walking.html">👣 Walking</a>
-        <a href="water.html">💧 Water Tracker</a>
+        <a href="water.html" style="color: #6ab3f8;">💧 Water Tracker</a>
         <a href="sedentary.html">🪑 Sedentary Timer</a>
         <a href="stairs.html">🪜 Stairs Tracker</a>
         <a href="sleep.html">😴 Sleep Manager</a>
@@ -28,132 +27,129 @@
         <span class="menu-icon" onclick="openNav()">&#9776;</span>
     </div>
 
-    <div class="container">
+    <div class="container" style="margin-top: 0;">
         <h2>💧 Water Tracker</h2>
-        <p style="color:#666;font-size:0.9em;">Record intake. Goal based on weight.</p>
+        <p style="text-align:center; color:#666;">Goal: <span id="goal-display">2000</span> mL</p>
 
         <div class="cup-container">
             <div class="cup">
-                <div id="cupWater" class="water"></div>
+                <div class="remained" id="remained">
+                    <span id="liters"></span>
+                    <small>Remained</small>
+                </div>
+                <div class="water" id="cupWater" style="height: 0%;"></div>
             </div>
         </div>
-        <div id="progressText" style="text-align:center;margin:10px 0;font-weight:bold;"></div>
+        
+        <div style="text-align:center; font-weight:bold; margin-bottom:15px; font-size:1.2em; color:#4a90e2;" id="progressText">0%</div>
 
-        <label>Amount (mL):</label>
-        <input type="number" id="waterAmount" placeholder="e.g., 250">
-        <button id="addWaterBtn">Add</button>
-
-        <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-            <button onclick="quickAdd(250)" class="secondary small">+250ml</button>
-            <button onclick="quickAdd(500)" class="secondary small">+500ml</button>
+        <div class="card">
+            <h3>Quick Add</h3>
+            <div class="cups">
+                <div class="cup-small" onclick="addWater(250)">250 ml</div>
+                <div class="cup-small" onclick="addWater(500)">500 ml</div>
+            </div>
+            
+            <div style="margin-top:15px; display:flex; gap:10px;">
+                <input type="number" id="custom-amount" placeholder="Custom mL" style="margin:0;">
+                <button class="primary-btn" onclick="addCustomWater()">Add</button>
+            </div>
         </div>
 
-        <div id="alertBox" style="text-align:center;margin-top:10px;"></div>
-        <hr style="border:0;border-top:1px solid #eee;margin:20px 0;">
-
-        <h3>History</h3>
-        <div id="summary" style="text-align:center;color:#666;margin-bottom:10px;">No records yet.</div>
-        <div style="overflow-x:auto;">
-            <table id="recordsTable">
-                <thead><tr><th>Date</th><th>Amount (mL)</th><th>Action</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-        <div style="text-align:center;margin-top:20px;">
-            <button id="clearBtn" class="danger-btn small">Clear History</button>
+        <div class="card">
+            <h3>Today's History</h3>
+            <div id="water-log" style="max-height:150px; overflow-y:auto;"></div>
+            <button class="danger-btn small" onclick="resetWater()" style="width:100%; margin-top:10px;">Reset Day</button>
         </div>
     </div>
 
     <script>
         function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
         function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
-        function showToast(msg) {
-            const t = document.getElementById("toast"); t.textContent = msg; t.className = "show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
-        }
+        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.className="show"; setTimeout(()=>t.className=t.className.replace("show",""),3000); }
 
-        const waterAmount = document.getElementById('waterAmount');
-        const addBtn = document.getElementById('addWaterBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const recordsTableBody = document.querySelector('#recordsTable tbody');
-        const summary = document.getElementById('summary');
-        const alertBox = document.getElementById('alertBox');
-        const cupWater = document.getElementById('cupWater');
-        const progressText = document.getElementById('progressText');
+        let totalWater = 0;
+        let goal = 2000;
+        let records = [];
 
-        let records = JSON.parse(localStorage.getItem('waterRecords') || '[]');
-        let savedWeight = localStorage.getItem('profileWeight');
-        let dailyGoal = (savedWeight && Number(savedWeight) > 0) ? Number(savedWeight) * 30 : 2000;
+        document.addEventListener('DOMContentLoaded', () => {
+            // 從 Profile 讀取體重來計算目標 (體重 x 30)
+            const w = localStorage.getItem('profileWeight');
+            if(w) goal = Math.round(w * 30);
+            document.getElementById('goal-display').textContent = goal;
 
-        function getTodayTotal() {
+            // 讀取紀錄
+            records = JSON.parse(localStorage.getItem('waterRecords') || '[]');
+            // 只篩選今天的
             const today = new Date().toLocaleDateString();
-            return records.filter(r => r.date === today).reduce((a, b) => a + b.amount, 0);
-        }
-
-        function updateCup() {
-            const total = getTodayTotal();
-            const ratio = Math.min(total / dailyGoal, 1);
-            const height = 100 - ratio * 100;
-            cupWater.style.height = height + "%";
-            progressText.textContent = `${total} / ${dailyGoal} ml`;
-
-            if (total >= dailyGoal) {
-                alertBox.innerHTML = `<span class="badge ok">🎉 Goal Reached!</span>`;
-                cupWater.style.backgroundColor = "transparent";
-            } else {
-                alertBox.innerHTML = total > 0 ? `<span class="badge ok">Already: ${total} ml</span>` : "";
-                cupWater.style.backgroundColor = "rgba(63, 169, 245, 0.55)";
-            }
-        }
-
-        function addWaterRecord(amount) {
-            if (amount <= 0) return showToast("Invalid amount.");
-            const item = { id: Date.now(), amount, date: new Date().toLocaleDateString() };
-            records.unshift(item);
-            localStorage.setItem('waterRecords', JSON.stringify(records));
+            records = records.filter(r => r.date === today);
             
-            let currentTotalVar = parseInt(localStorage.getItem('totalWater')) || 0;
-            localStorage.setItem('totalWater', currentTotalVar + amount);
-
-            waterAmount.value = "";
-            render();
-            showToast(`Added +${amount} mL`);
-        }
-
-        addBtn.addEventListener('click', () => addWaterRecord(Number(waterAmount.value)));
-        window.quickAdd = function(val) { addWaterRecord(val); }
-
-        clearBtn.addEventListener('click', () => {
-            if (!confirm("Clear history?")) return;
-            records = [];
-            localStorage.removeItem('waterRecords');
-            localStorage.setItem('totalWater', 0);
-            render();
-            showToast("Cleared");
+            calculateTotal();
         });
 
-        window.deleteRecord = function(id) {
-            const target = records.find(r => r.id === id);
-            if(target) {
-                let currentTotalVar = parseInt(localStorage.getItem('totalWater')) || 0;
-                localStorage.setItem('totalWater', Math.max(0, currentTotalVar - target.amount));
-            }
-            records = records.filter(x => x.id !== id);
-            localStorage.setItem('waterRecords', JSON.stringify(records));
-            render();
-        };
-
-        function render() {
-            recordsTableBody.innerHTML = "";
-            summary.style.display = records.length === 0 ? "block" : "none";
-            for (const r of records) {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `<td>${r.date}</td><td>${r.amount}</td><td style="text-align:center"><button class="danger-btn small" onclick="deleteRecord(${r.id})">×</button></td>`;
-                recordsTableBody.appendChild(tr);
-            }
-            updateCup();
+        function addWater(amount) {
+            records.push({ id: Date.now(), amount: amount, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() });
+            saveAndRender();
+            showToast(`Added ${amount}ml`);
         }
-        render();
+
+        function addCustomWater() {
+            const val = parseInt(document.getElementById('custom-amount').value);
+            if(!val || val <= 0) return showToast('Invalid amount');
+            addWater(val);
+            document.getElementById('custom-amount').value = '';
+        }
+
+        function resetWater() {
+            if(confirm('Reset today\'s water?')) {
+                records = [];
+                saveAndRender();
+            }
+        }
+
+        function saveAndRender() {
+            // 更新全域記錄
+            let allRecords = JSON.parse(localStorage.getItem('waterRecords') || '[]');
+            // 移除今天的舊資料
+            const today = new Date().toLocaleDateString();
+            allRecords = allRecords.filter(r => r.date !== today);
+            // 加入新的
+            allRecords = allRecords.concat(records);
+            
+            localStorage.setItem('waterRecords', JSON.stringify(allRecords));
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            totalWater = records.reduce((sum, r) => sum + r.amount, 0);
+            localStorage.setItem('totalWater', totalWater); // 給 Dashboard 用
+
+            // Update UI
+            const pct = Math.min(100, (totalWater / goal) * 100);
+            document.getElementById('cupWater').style.height = `${pct}%`;
+            document.getElementById('progressText').textContent = `${Math.round(pct)}%`;
+            
+            if(totalWater >= goal) {
+                document.getElementById('remained').innerHTML = '<span style="font-size:1.2em;">Goal Reached!</span>';
+            } else {
+                const rem = goal - totalWater;
+                document.getElementById('liters').textContent = `${rem / 1000}L`;
+            }
+
+            // Render list (這就是您截圖報錯的地方，現在已修正)
+            const list = document.getElementById('water-log');
+            list.innerHTML = '';
+            records.slice().reverse().forEach(r => {
+                const div = document.createElement('div');
+                div.style.padding = '8px';
+                div.style.borderBottom = '1px solid #eee';
+                div.style.display = 'flex';
+                div.style.justify-content = 'space-between';
+                // 這裡使用了反引號 ` `
+                div.innerHTML = `<span>${r.amount} ml</span> <small style="color:#999">${r.time}</small>`;
+                list.appendChild(div);
+            });
+        }
     </script>
 </body>
 </html>

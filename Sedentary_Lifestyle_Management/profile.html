@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link rel="stylesheet" href="style.css">
-    <style>.header-bar { background-color: transparent; }</style>
 </head>
 <body>
     <div id="overlay" onclick="closeNav()"></div>
     <div id="toast"></div>
 
-        <div id="mySidenav" class="sidenav">
+    <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <a href="index.html">📊 Dashboard</a>
-        <a href="profile.html">👤 User Profile</a>
+        <a href="profile.html" style="color: #6ab3f8;">👤 User Profile</a>
         <a href="diet.html">🍎 Diet Tracker</a>
         <a href="walking.html">👣 Walking</a>
         <a href="water.html">💧 Water Tracker</a>
@@ -29,67 +28,135 @@
     </div>
 
     <div class="container" style="margin-top: 0;">
-        <h2>👤 Personal Information</h2>
-        <p>Enter your details to calculate BMI & calibrate goals.</p>
+        <h2>👤 Personal Profile</h2>
+        <div class="card">
+            <p style="color:#666; font-size:0.9em; margin-bottom:15px;">
+                We use this info to calculate your BMI, TDEE (Calories), and water goals.
+            </p>
 
-        <label>Age:</label>
-        <input type="number" id="input-age" placeholder="e.g. 25">
-        <label>Height (cm):</label>
-        <input type="number" id="input-height" placeholder="e.g. 175">
-        <label>Weight (kg):</label>
-        <input type="number" id="input-weight" placeholder="e.g. 70">
+            <div class="form-group">
+                <label>Gender</label>
+                <select id="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
 
-        <button onclick="saveProfile()">Save & Calculate BMI</button>
+            <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" id="input-age" placeholder="e.g. 25">
+            </div>
 
-        <div id="bmi-box" class="bmi-result">
-            <h3>Your BMI</h3>
-            <div class="bmi-value" id="display-bmi">--</div>
-            <p id="bmi-category" style="color: #666; margin-bottom:0;"></p>
+            <div class="form-group">
+                <label>Height (cm)</label>
+                <input type="number" id="input-height" placeholder="e.g. 175">
+            </div>
+
+            <div class="form-group">
+                <label>Weight (kg)</label>
+                <input type="number" id="input-weight" placeholder="e.g. 70">
+            </div>
+
+            <div class="form-group">
+                <label>Activity Level</label>
+                <select id="activity">
+                    <option value="sedentary">Sedentary (Little exercise)</option>
+                    <option value="light">Light (1-3 days/week)</option>
+                    <option value="moderate">Moderate (3-5 days/week)</option>
+                    <option value="heavy">Heavy (6-7 days/week)</option>
+                    <option value="very_heavy">Very Heavy (Physical job)</option>
+                </select>
+            </div>
+
+            <button class="primary-btn" onclick="saveProfile()" style="width:100%; margin-top:10px;">
+                Save & Recalculate
+            </button>
+        </div>
+
+        <div class="card" id="results-card" style="display:none; text-align:center;">
+            <h3>Your Metrics</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                <div style="background:#f4f9ff; padding:10px; border-radius:8px;">
+                    <div style="color:#777; font-size:0.9em;">BMI</div>
+                    <div id="display-bmi" style="font-size:1.5em; font-weight:bold; color:#4a90e2;">--</div>
+                    <small id="bmi-category"></small>
+                </div>
+                <div style="background:#fff8e1; padding:10px; border-radius:8px;">
+                    <div style="color:#777; font-size:0.9em;">Daily Calories</div>
+                    <div id="display-tdee" style="font-size:1.5em; font-weight:bold; color:#f39c12;">--</div>
+                    <small>kcal/day</small>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
         function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
-        function showToast(msg) {
-            const t = document.getElementById("toast"); t.textContent = msg; t.className = "show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
-        }
+        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.className="show"; setTimeout(()=>t.className=t.className.replace("show",""),3000); }
 
-        window.onload = function() {
-            const savedAge = localStorage.getItem('profileAge');
-            const savedHeight = localStorage.getItem('profileHeight');
-            const savedWeight = localStorage.getItem('profileWeight');
-            if(savedAge) document.getElementById('input-age').value = savedAge;
-            if(savedHeight) document.getElementById('input-height').value = savedHeight;
-            if(savedWeight) document.getElementById('input-weight').value = savedWeight;
-            if(savedHeight && savedWeight) calculateBMI(savedHeight, savedWeight);
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const fields = ['profileAge', 'profileHeight', 'profileWeight', 'profileGender', 'profileActivity'];
+            const ids = ['input-age', 'input-height', 'input-weight', 'gender', 'activity'];
+            
+            ids.forEach((id, index) => {
+                const val = localStorage.getItem(fields[index]);
+                if(val) document.getElementById(id).value = val;
+            });
+
+            if(localStorage.getItem('profileWeight')) calcMetrics();
+        });
 
         function saveProfile() {
             const age = document.getElementById('input-age').value;
             const height = document.getElementById('input-height').value;
             const weight = document.getElementById('input-weight').value;
-            if(!age || !height || !weight) return showToast('Please fill in all fields.');
+            const gender = document.getElementById('gender').value;
+            const activity = document.getElementById('activity').value;
+
+            if(!age || !height || !weight) return showToast('Please fill all fields');
 
             localStorage.setItem('profileAge', age);
             localStorage.setItem('profileHeight', height);
             localStorage.setItem('profileWeight', weight);
-            calculateBMI(height, weight);
+            localStorage.setItem('profileGender', gender);
+            localStorage.setItem('profileActivity', activity);
+
+            calcMetrics();
             showToast('Profile Saved!');
         }
 
-        function calculateBMI(h, w) {
-            const heightInMeters = h / 100;
-            const bmi = (w / (heightInMeters * heightInMeters)).toFixed(1);
-            document.getElementById('bmi-box').style.display = 'block';
+        function calcMetrics() {
+            const w = parseFloat(localStorage.getItem('profileWeight'));
+            const h = parseFloat(localStorage.getItem('profileHeight'));
+            const a = parseFloat(localStorage.getItem('profileAge'));
+            const g = localStorage.getItem('profileGender');
+            const act = localStorage.getItem('profileActivity');
+
+            // BMI
+            const h_m = h / 100;
+            const bmi = (w / (h_m * h_m)).toFixed(1);
+            
+            let cat = '';
+            if(bmi < 18.5) cat = 'Underweight';
+            else if(bmi < 24.9) cat = 'Normal';
+            else if(bmi < 29.9) cat = 'Overweight';
+            else cat = 'Obese';
+
             document.getElementById('display-bmi').textContent = bmi;
-            let category = '';
-            if(bmi < 18.5) category = '(Underweight)';
-            else if(bmi < 24.9) category = '(Normal weight)';
-            else if(bmi < 29.9) category = '(Overweight)';
-            else category = '(Obese)';
-            document.getElementById('bmi-category').textContent = category;
+            document.getElementById('bmi-category').textContent = cat;
+
+            // TDEE (Mifflin-St Jeor)
+            let bmr = (10 * w) + (6.25 * h) - (5 * a);
+            bmr += (g === 'male') ? 5 : -161;
+
+            const factors = { sedentary: 1.2, light: 1.375, moderate: 1.55, heavy: 1.725, very_heavy: 1.9 };
+            const tdee = Math.round(bmr * (factors[act] || 1.2));
+
+            localStorage.setItem('tdee', tdee);
+            document.getElementById('display-tdee').textContent = tdee;
+            
+            document.getElementById('results-card').style.display = 'block';
         }
     </script>
 </body>

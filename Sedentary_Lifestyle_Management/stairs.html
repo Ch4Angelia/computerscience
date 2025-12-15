@@ -5,58 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stairs Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .header-bar { background-color: transparent; }
-        .container { padding: 20px; font-family: Arial, sans-serif; }
-        
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .action-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-
-        .action-card h3 { margin: 0 0 10px 0; font-size: 1.1em; }
-        
-        .floor-count { font-size: 2em; font-weight: bold; color: #333; }
-        
-        #calories-display {
-            font-size: 28px;
-            color: #e67e22;
-            font-weight: bold;
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #fff3e0;
-            border-radius: 8px;
-            display: block;
-            text-align: center;
-        }
-
-        .manual-input-group {
-            margin-bottom: 10px;
-            text-align: left;
-        }
-        .manual-input-group label {
-            display: inline-block;
-            width: 100px;
-            color: #555;
-        }
-        input { padding: 8px; width: 80px; }
-    </style>
 </head>
 <body>
     <div id="overlay" onclick="closeNav()"></div>
     <div id="toast"></div>
 
-        <div id="mySidenav" class="sidenav">
+    <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <a href="index.html">📊 Dashboard</a>
         <a href="profile.html">👤 User Profile</a>
@@ -64,7 +18,7 @@
         <a href="walking.html">👣 Walking</a>
         <a href="water.html">💧 Water Tracker</a>
         <a href="sedentary.html">🪑 Sedentary Timer</a>
-        <a href="stairs.html">🪜 Stairs Tracker</a>
+        <a href="stairs.html" style="color: #6ab3f8;">🪜 Stairs Tracker</a>
         <a href="sleep.html">😴 Sleep Manager</a>
         <a href="exercise.html">🏃 Exercise</a>
     </div>
@@ -73,148 +27,72 @@
         <span class="menu-icon" onclick="openNav()">&#9776;</span>
     </div>
 
-    <div class="container">
+    <div class="container" style="margin-top: 0;">
         <h2>🪜 Stairs Tracker</h2>
-        <p style="color:#666; font-size:0.9em; text-align:center;">
-            Separate tracking for Up & Down.<br>Calories adjusted by weight.
-        </p>
-
-        <div id="calories-display">🔥 0 kcal</div>
+        
+        <div class="card" style="text-align:center; background:#fff8e1;">
+            <h3 style="margin-top:0;">Est. Calories Burned</h3>
+            <div id="cal-display" style="font-size:2.5em; font-weight:bold; color:#e67e22;">0</div>
+            <small>kcal</small>
+        </div>
 
         <div class="action-grid">
-            <div class="action-card" style="border-top: 3px solid #ff6b6b;">
-                <h3>⬆️ Up (Climb)</h3>
-                <div id="up-display" class="floor-count">0</div>
-                <div style="font-size:0.8em; color:#888; margin-bottom:5px;">Floors</div>
-                <button id="add-up-btn" style="width:100%; background-color:#ff6b6b;">+1 Floor</button>
+            <div class="action-card" style="border-top: 4px solid #ff6b6b;">
+                <h3>⬆️ Up</h3>
+                <div id="up-count" style="font-size:2em; font-weight:bold;">0</div>
+                <small>Floors</small>
+                <button class="primary-btn small" onclick="addFloor('up')" style="width:100%; margin-top:10px;">+1 Floor</button>
             </div>
-
-            <div class="action-card" style="border-top: 3px solid #4ecdc4;">
-                <h3>⬇️ Down (Descend)</h3>
-                <div id="down-display" class="floor-count">0</div>
-                <div style="font-size:0.8em; color:#888; margin-bottom:5px;">Floors</div>
-                <button id="add-down-btn" style="width:100%; background-color:#4ecdc4;">+1 Floor</button>
+            <div class="action-card" style="border-top: 4px solid #4ecdc4;">
+                <h3>⬇️ Down</h3>
+                <div id="down-count" style="font-size:2em; font-weight:bold;">0</div>
+                <small>Floors</small>
+                <button class="secondary small" onclick="addFloor('down')" style="width:100%; margin-top:10px;">+1 Floor</button>
             </div>
         </div>
 
-        <div style="text-align:center; margin-bottom:20px;">
-            <button id="reset-btn" class="secondary" style="width:auto; padding:8px 20px;">Reset All</button>
-        </div>
-
-        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-
-        <div style="background:#f9f9f9; padding:15px; border-radius:8px;">
-            <h3 style="margin-top:0; font-size:1.1em; text-align:center;">Manual Entry</h3>
-            
-            <div class="manual-input-group">
-                <label>⬆️ Up Floors:</label>
-                <input type="number" id="input-up" placeholder="0" min="0">
-            </div>
-            
-            <div class="manual-input-group">
-                <label>⬇️ Down Floors:</label>
-                <input type="number" id="input-down" placeholder="0" min="0">
-            </div>
-
-            <div class="manual-input-group">
-                <label>Stairs/Floor:</label>
-                <input type="number" id="stairs-input" value="20" min="1">
-            </div>
-
-            <div style="text-align:center; margin-top:15px;">
-                <button id="calculate-btn" style="width:100%;">Calculate Total</button>
-            </div>
+        <div style="text-align:center;">
+            <button class="danger-btn small" onclick="resetStairs()">Reset Counter</button>
         </div>
     </div>
 
     <script>
         function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
         function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
-        function showToast(msg) {
-            const t = document.getElementById("toast"); t.textContent = msg; t.className = "show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.className="show"; setTimeout(()=>t.className=t.className.replace("show",""),3000); }
+
+        let up = parseInt(localStorage.getItem('stairsUp')) || 0;
+        let down = parseInt(localStorage.getItem('stairsDown')) || 0;
+        const weight = Number(localStorage.getItem('profileWeight')) || 70;
+
+        function updateUI() {
+            document.getElementById('up-count').textContent = up;
+            document.getElementById('down-count').textContent = down;
+            
+            // METs assumption: Up=8.0, Down=3.0. Avg floor 3 meters. Very rough est.
+            // Simplified logic: Up = 0.17 kcal/step * 20 steps/floor * weight/70
+            const calUp = up * 20 * 0.15 * (weight/70);
+            const calDown = down * 20 * 0.05 * (weight/70);
+            document.getElementById('cal-display').textContent = (calUp + calDown).toFixed(1);
+
+            localStorage.setItem('stairsUp', up);
+            localStorage.setItem('stairsDown', down);
         }
 
-        let floorsUp = 0;
-        let floorsDown = 0;
-        let stairsPerFloor = 20;
-
-        const savedWeight = localStorage.getItem('profileWeight');
-        const userWeight = (savedWeight && Number(savedWeight) > 0) ? Number(savedWeight) : 70;
-
-        const upDisplay = document.getElementById('up-display');
-        const downDisplay = document.getElementById('down-display');
-        const calDisplay = document.getElementById('calories-display');
-        
-        const addUpBtn = document.getElementById('add-up-btn');
-        const addDownBtn = document.getElementById('add-down-btn');
-        const resetBtn = document.getElementById('reset-btn');
-
-        const inputUp = document.getElementById('input-up');
-        const inputDown = document.getElementById('input-down');
-        const inputStairs = document.getElementById('stairs-input');
-        const calcBtn = document.getElementById('calculate-btn');
-
-        function updateDisplay() {
-            upDisplay.textContent = floorsUp;
-            downDisplay.textContent = floorsDown;
-
-            const factorUp = 0.17;
-            const factorDown = 0.05;
-
-            const weightRatio = userWeight / 70;
-
-            const stepsUp = floorsUp * stairsPerFloor;
-            const stepsDown = floorsDown * stairsPerFloor;
-
-            const calUp = stepsUp * factorUp * weightRatio;
-            const calDown = stepsDown * factorDown * weightRatio;
-            const totalCal = (calUp + calDown).toFixed(1);
-
-            calDisplay.textContent = `🔥 ${totalCal} kcal`;
+        function addFloor(dir) {
+            if(dir === 'up') up++;
+            else down++;
+            updateUI();
         }
 
-        addUpBtn.addEventListener('click', () => {
-            floorsUp++;
-            updateDisplay();
-            showToast('⬆️ Up +1 Floor');
-        });
-
-        addDownBtn.addEventListener('click', () => {
-            floorsDown++;
-            updateDisplay();
-            showToast('⬇️ Down +1 Floor');
-        });
-
-        resetBtn.addEventListener('click', () => {
-            if(confirm('Reset all stairs count?')) {
-                floorsUp = 0;
-                floorsDown = 0;
-                updateDisplay();
-                showToast('Reset');
+        function resetStairs() {
+            if(confirm('Reset counters?')) {
+                up = 0; down = 0;
+                updateUI();
             }
-        });
+        }
 
-        calcBtn.addEventListener('click', () => {
-            const upVal = parseInt(inputUp.value) || 0;
-            const downVal = parseInt(inputDown.value) || 0;
-            const stairVal = parseInt(inputStairs.value);
-
-            if (upVal < 0 || downVal < 0) return showToast('Invalid numbers');
-
-            floorsUp = upVal;
-            floorsDown = downVal;
-            stairsPerFloor = stairVal || 20;
-
-            updateDisplay();
-            
-            upDisplay.textContent = floorsUp;
-            downDisplay.textContent = floorsDown;
-            
-            showToast('Calculated!');
-        });
-
-        updateDisplay();
+        updateUI();
     </script>
 </body>
 </html>

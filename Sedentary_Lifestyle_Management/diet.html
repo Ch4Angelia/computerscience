@@ -14,7 +14,7 @@
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <a href="index.html">📊 Dashboard</a>
         <a href="profile.html">👤 User Profile</a>
-        <a href="diet.html" style="color: white;">🍎 Diet Tracker</a>
+        <a href="diet.html" style="color: #6ab3f8;">🍎 Diet Tracker</a>
         <a href="walking.html">👣 Walking</a>
         <a href="water.html">💧 Water Tracker</a>
         <a href="sedentary.html">🪑 Sedentary Timer</a>
@@ -33,75 +33,63 @@
         <div class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
         </div>
-        <p style="text-align: right; margin-top: 5px;">
-            <span id="current-cal" style="font-weight: bold; color: #e67e22;">0</span> kcal / <span id="target-cal" style="color: #666;">--</span> kcal 
-            <span id="status-text" style="font-size: small;"></span>
+        <p style="text-align: right; margin-top: 5px; font-size: 0.9em;">
+            <span id="current-cal" style="font-weight: bold; color: var(--primary-color);">0</span> / 
+            <span id="target-cal" style="color: #666;">--</span> kcal 
+            <span id="status-text" style="font-weight:bold; margin-left:5px;"></span>
         </p>
         
-        <div class="card" style="margin-top: 20px;">
-            <h3>🔍 Search & Add Food</h3>
+        <div class="card">
+            <h3>🔍 Add Food</h3>
             
-            <div class="update-db-area">
-                <button id="update-button" class="primary-btn small" onclick="triggerDBUpdate()">
-                    ⚡ Update DB
-                </button>
-                <span id="update-status" style="font-size: 0.9em; color: #007bff;">Loading database status...</span>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                <button id="update-button" class="primary-btn small" onclick="triggerDBUpdate()">⚡ Update DB</button>
+                <span id="update-status" style="font-size: 0.85em; color: #777;">Ready</span>
             </div>
             
-            <div class="search-container">
-                <input type="text" id="search-box" placeholder="Enter food name (Chinese or English)" onkeyup="filterFood()">
-            </div>
-            
-            <div id="food-search-results">
-                <div style="text-align:center; color:#999; margin-top:20px;">Start typing to search food...</div>
+            <div style="position:relative;">
+                <input type="text" id="search-box" placeholder="Search food name..." onkeyup="filterFood()">
+                <div id="search-results" style="border:1px solid #eee; display:none; max-height:200px; overflow-y:auto; margin-top:-10px; background:#fff; border-radius:0 0 8px 8px; position:absolute; width:100%; z-index:10; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                </div>
             </div>
 
-            <div id="quantity-input-area" class="card" style="margin-top: 15px; display: none; background: #fff;">
-                <h4 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px;">Log Portion: <span id="selected-food-name" style="color: #1877f2;"></span></h4>
+            <div id="quantity-input-area" style="display: none; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary-color);">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Log: <span id="selected-food-name" style="color: var(--primary-color);"></span></h4>
+                
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="number" id="portion-input" placeholder="Grams (e.g., 150)" value="100" min="1" style="width: 120px;">
-                    <span style="font-weight: bold;">grams (g)</span>
-                    <button id="log-confirm-button" class="primary-btn" onclick="confirmLog()">Log</button>
-                    <button class="danger-btn" onclick="hideQuantityInput()">Cancel</button>
+                    <input type="number" id="portion-input" value="100" style="width: 100px; margin:0;">
+                    <span>g</span>
                 </div>
-                <p id="portion-preview" class="nutrition-detail" style="margin-top: 10px;"></p>
+                
+                <p id="portion-preview" style="font-size: 0.9em; color: #666; margin: 10px 0;"></p>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="primary-btn small" onclick="confirmLog()">Add to Log</button>
+                    <button class="secondary small" onclick="hideQuantityInput()">Cancel</button>
+                </div>
             </div>
         </div>
 
-        <div class="card" style="margin-top: 20px;">
+        <div class="card">
             <h3>🗓️ Today's Log</h3>
             <div id="food-log">
-                <div style="text-align:center; color:#999; margin-top:20px;">No food logged yet.</div>
+                <p style="text-align:center; color:#999;">No food logged yet.</p>
             </div>
-            <button onclick="clearFoodLog()" class="danger-btn" style="margin-top: 15px;">Clear Log</button>
+            <button onclick="clearFoodLog()" class="danger-btn small" style="width:100%; margin-top:15px;">Clear Log</button>
         </div>
-        
     </div>
 
     <script>
-        // --- Navigation and General Functions (漢堡選單修復) ---
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-            document.getElementById("overlay").style.display = "block";
-        }
+        function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
+        function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
+        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.className="show"; setTimeout(()=>t.className=t.className.replace("show",""),3000); }
 
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-            document.getElementById("overlay").style.display = "none";
-        }
+        let selectedFood = null;
+        let todayFoods = [];
+        let foodDatabase = [];
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-        }
-        
-        // --- 核心飲食追蹤邏輯 ---
-        
-        let selectedFood = null; 
-
-        // ⚠️ 1. EMBEDDED FOOD DATABASE (PASTE YOUR FULL JSON HERE)
+        // ⚠️⚠️⚠️ 請在此處貼上您的完整 JSON 資料 ⚠️⚠️⚠️
+        // 將下方的 [] 替換為您原本的 2000 行 JSON
         let foodDatabaseRaw = [
     {
         "id": "A0100101",
@@ -24083,322 +24071,218 @@
         "unit_per_serving": "100g",
         "base_unit": "g"
     }
-];
-
-        let foodDatabase = []; 
-        let todayFoods = [];  
-        let foodLog = document.getElementById('food-log');
-        let foodSearchResults = document.getElementById('food-search-results');
-        const updateButton = document.getElementById('update-button');
-        const updateStatus = document.getElementById('update-status');
-        
-        const quantityArea = document.getElementById('quantity-input-area');
-        const selectedFoodName = document.getElementById('selected-food-name');
-        const portionInput = document.getElementById('portion-input');
-        const portionPreview = document.getElementById('portion-preview');
-
+]; 
 
         document.addEventListener('DOMContentLoaded', () => {
-            processEmbeddedFoodDatabase(); 
+            // 如果 user 忘記貼 JSON，這裡會防止報錯，並顯示提示
+            if (foodDatabaseRaw.length === 0) {
+                console.warn("No food data found. Please edit diet.html and paste the JSON data into 'foodDatabaseRaw'.");
+            }
+            processDatabase();
             loadFoodLog();
             updateDashboard();
-
-            portionInput.addEventListener('input', previewPortion);
+            document.getElementById('portion-input').addEventListener('input', previewPortion);
         });
-        
-        // 🚨 更新：資料庫更新函式
-        window.triggerDBUpdate = function() {
-            updateButton.disabled = true;
-            updateButton.innerHTML = '<span class="loading-spinner"></span> Updating...';
-            updateStatus.textContent = 'Processing database update...';
-            updateStatus.style.color = '#1877f2';
 
-            // 模擬更新過程，持續 3 秒
-            setTimeout(() => {
-                updateButton.disabled = false;
-                updateButton.innerHTML = '⚡ Update DB';
-                
-                // 顯示更新成功的狀態
-                updateStatus.textContent = `✅ Database loaded (${foodDatabase.length} items) is up to date.`;
-                updateStatus.style.color = 'green';
-                showToast('Database update complete!');
-            }, 3000); 
-        }
-
-        // 2. Data Processing and Field Mapping
-        function processEmbeddedFoodDatabase() {
-             updateStatus.textContent = 'Processing data...';
-             updateStatus.style.color = '#1877f2';
-             
-             if (foodDatabaseRaw.length > 0) {
-                 foodDatabase = foodDatabaseRaw.map(item => ({
-                     id: item.id,
-                     zh: item.name,
-                     en: item.english_name || '',
-                     cal: parseFloat(item.calories) || 0,
-                     protein: parseFloat(item.protein) || 0,
-                     fat: parseFloat(item.fat) || 0,
-                     carbs: parseFloat(item.carbs) || 0,
-                     unit_per_serving: item.unit_per_serving || '100g' 
-                 }));
-                 
-                 updateStatus.textContent = `✅ Database loaded (${foodDatabase.length} items).`;
-                 updateStatus.style.color = 'green';
-                 
-             } else {
-                 foodSearchResults.innerHTML = `<div style="text-align:center; color:red; margin-top:20px;">🚨 Embedded database is empty! Cannot search.</div>`;
-                 updateStatus.textContent = '🚨 Data Empty! Check HTML script.';
-                 updateStatus.style.color = 'red';
-             }
-        }
-        
-        // 3. Search Handler (維持不變)
-        window.filterFood = function() {
-            const query = document.getElementById('search-box').value.toLowerCase().trim();
-            if (foodDatabase.length === 0) return;
-            if (query.length < 1) { displaySearchResults([]); return; }
-
-            const filtered = foodDatabase.filter(food => {
-                return (food.zh && food.zh.toLowerCase().includes(query)) ||
-                       (food.en && food.en.toLowerCase().includes(query));
-            });
-            displaySearchResults(filtered.slice(0, 15)); 
-        }
-        
-        // 4. Display Results Function (維持不變)
-        function displaySearchResults(results) {
-            foodSearchResults.innerHTML = '';
-            
-            if (results.length === 0 && document.getElementById('search-box').value.length > 0) {
-                foodSearchResults.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px;">No results found.</div>';
-                return;
+        function processDatabase() {
+            if (foodDatabaseRaw.length > 0) {
+                foodDatabase = foodDatabaseRaw.map(item => ({
+                    id: item.id,
+                    zh: item.name,
+                    en: item.english_name || '',
+                    cal: parseFloat(item.calories) || 0,
+                    p: parseFloat(item.protein) || 0,
+                    f: parseFloat(item.fat) || 0,
+                    c: parseFloat(item.carbs) || 0
+                }));
+                document.getElementById('update-status').textContent = `✅ ${foodDatabase.length} items loaded`;
+                document.getElementById('update-status').style.color = '#2ecc71';
+            } else {
+                document.getElementById('update-status').textContent = '⚠️ Database Empty';
+                document.getElementById('update-status').style.color = '#e74c3c';
             }
-            
-            results.forEach(food => {
-                const div = document.createElement('div');
-                div.className = 'food-list-item';
-                
-                const displayName = `${food.zh} ${food.en ? `(${food.en})` : ''}`;
-                
-                const nutritionInfo = `
-                    <div class="nutrition-detail">
-                        Per ${food.unit_per_serving}: 
-                        Protein: ${food.protein.toFixed(1)}g | Fat: ${food.fat.toFixed(1)}g | Carbs: ${food.carbs.toFixed(1)}g
-                    </div>
-                `;
-                
-                div.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold;">${displayName}</div>
-                        ${nutritionInfo}
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="color:#e67e22; font-weight:bold;">${food.cal.toFixed(1)} kcal</span>
-                        <button class="primary-btn small" 
-                                onclick="selectFoodForInput(${JSON.stringify(food).replace(/"/g, '&quot;')})" 
-                                style="padding:2px 8px;">+</button>
-                    </div>`;
-                foodSearchResults.appendChild(div);
-            });
-        }
-        
-        // 🚨 顯示內嵌輸入介面 (維持不變)
-        window.selectFoodForInput = function(food) {
-            selectedFood = food; 
-            quantityArea.style.display = 'block';
-            selectedFoodName.textContent = `${food.zh} ${food.en ? `(${food.en})` : ''}`;
-            portionInput.value = 100; 
-            previewPortion();
-            quantityArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // 🚨 隱藏輸入介面 (維持不變)
-        window.hideQuantityInput = function() {
-            quantityArea.style.display = 'none';
+        function triggerDBUpdate() {
+            const btn = document.getElementById('update-button');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span>';
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '⚡ Update DB';
+                showToast('Database Synced!');
+            }, 1500);
+        }
+
+        function filterFood() {
+            const query = document.getElementById('search-box').value.toLowerCase().trim();
+            const resultsDiv = document.getElementById('search-results');
+            
+            if (query.length < 1) { 
+                resultsDiv.style.display = 'none'; 
+                return; 
+            }
+
+            const filtered = foodDatabase.filter(f => 
+                (f.zh && f.zh.toLowerCase().includes(query)) || 
+                (f.en && f.en.toLowerCase().includes(query))
+            ).slice(0, 10); // Limit to 10 results
+
+            resultsDiv.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:10px; text-align:center; color:#999;">No results found</div>';
+            } else {
+                filtered.forEach(f => {
+                    const div = document.createElement('div');
+                    div.style.padding = '10px';
+                    div.style.borderBottom = '1px solid #eee';
+                    div.style.cursor = 'pointer';
+                    div.innerHTML = `<strong>${f.zh}</strong> <small style="color:#888">${f.en}</small>`;
+                    div.onclick = () => selectFood(f);
+                    div.onmouseover = () => div.style.backgroundColor = '#f4f9ff';
+                    div.onmouseout = () => div.style.backgroundColor = '#fff';
+                    resultsDiv.appendChild(div);
+                });
+            }
+            resultsDiv.style.display = 'block';
+        }
+
+        function selectFood(food) {
+            selectedFood = food;
+            document.getElementById('search-results').style.display = 'none';
+            document.getElementById('search-box').value = '';
+            
+            const inputArea = document.getElementById('quantity-input-area');
+            inputArea.style.display = 'block';
+            document.getElementById('selected-food-name').textContent = food.zh;
+            document.getElementById('portion-input').value = 100;
+            previewPortion();
+        }
+
+        function hideQuantityInput() {
+            document.getElementById('quantity-input-area').style.display = 'none';
             selectedFood = null;
         }
 
-        // 🚨 即時預覽份量換算結果 (維持不變)
-        window.previewPortion = function() {
+        function previewPortion() {
             if (!selectedFood) return;
-
-            const grams = parseFloat(portionInput.value);
-            const food = selectedFood;
-
-            if (isNaN(grams) || grams <= 0) {
-                portionPreview.innerHTML = 'Please enter a valid amount in grams.';
-                portionPreview.style.color = 'red';
-                document.getElementById('log-confirm-button').disabled = true;
-                return;
+            const g = parseFloat(document.getElementById('portion-input').value);
+            if (!g || g <= 0) { 
+                document.getElementById('portion-preview').textContent = "Enter valid grams"; 
+                return; 
             }
-
-            const ratio = grams / 100;
-            const finalCal = food.cal * ratio;
-            const finalProtein = food.protein * ratio;
-            const finalFat = food.fat * ratio;
-            const finalCarbs = food.carbs * ratio;
-
-            portionPreview.innerHTML = `
-                <strong>Preview:</strong> ${grams.toFixed(0)}g = 
-                <span style="color:#e67e22;">${finalCal.toFixed(1)} kcal</span> | 
-                P: ${finalProtein.toFixed(1)}g | 
-                F: ${finalFat.toFixed(1)}g | 
-                C: ${finalCarbs.toFixed(1)}g
+            const r = g / 100;
+            document.getElementById('portion-preview').innerHTML = `
+                🔥 ${(selectedFood.cal * r).toFixed(1)} kcal <br>
+                <span style="font-size:0.9em; color:#666;">
+                P: ${(selectedFood.p * r).toFixed(1)} | 
+                F: ${(selectedFood.f * r).toFixed(1)} | 
+                C: ${(selectedFood.c * r).toFixed(1)}
+                </span>
             `;
-            portionPreview.style.color = '#333';
-            document.getElementById('log-confirm-button').disabled = false;
         }
 
-        // 🚨 確認記錄 (維持不變)
-        window.confirmLog = function() {
+        function confirmLog() {
             if (!selectedFood) return;
-            
-            const grams = parseFloat(portionInput.value);
+            const g = parseFloat(document.getElementById('portion-input').value);
+            if (!g || g <= 0) return showToast('Invalid amount');
 
-            if (isNaN(grams) || grams <= 0) {
-                showToast('Invalid quantity. Please correct the grams input.');
-                return;
-            }
-
-            logFood(selectedFood, grams);
-            hideQuantityInput();
-        }
-
-        // 5. Log Food (維持不變)
-        window.logFood = function(food, grams) {
-            const ratio = grams / 100;
-
-            const finalCal = food.cal * ratio;
-            const finalProtein = food.protein * ratio;
-            const finalFat = food.fat * ratio;
-            const finalCarbs = food.carbs * ratio;
-
-            const newId = todayFoods.length > 0 ? Math.max(...todayFoods.map(f => f.id)) + 1 : 1;
-            
-            todayFoods.push({ 
-                id: newId, 
-                name: food.zh, 
-                en: food.en,   
-                cal: finalCal, 
-                protein: finalProtein, 
-                fat: finalFat, 
-                carbs: finalCarbs,
-                grams: grams
+            const r = g / 100;
+            todayFoods.push({
+                id: Date.now(),
+                name: selectedFood.zh,
+                en: selectedFood.en,
+                grams: g,
+                cal: selectedFood.cal * r,
+                p: selectedFood.p * r,
+                f: selectedFood.f * r,
+                c: selectedFood.c * r
             });
+            
             localStorage.setItem('todayFoods', JSON.stringify(todayFoods));
-            showToast(`${food.zh} (${grams.toFixed(0)}g) added to log!`);
+            hideQuantityInput();
             updateDashboard();
+            showToast('Food Added!');
         }
 
-        // 6. Delete Food (維持不變)
-        window.deleteFood = function(id) {
+        function deleteFood(id) {
             todayFoods = todayFoods.filter(f => f.id !== id);
             localStorage.setItem('todayFoods', JSON.stringify(todayFoods));
-            showToast('Item deleted!');
             updateDashboard();
         }
 
-        // 7. Clear Food Log (維持不變)
-        window.clearFoodLog = function() {
-            if(confirm('Are you sure you want to clear today\'s food log? This cannot be undone.')) {
+        function clearFoodLog() {
+            if(confirm("Clear today's log?")) {
                 todayFoods = [];
                 localStorage.removeItem('todayFoods');
-                showToast('Log Cleared!');
                 updateDashboard();
             }
         }
 
-        // 8. Load Food Log (維持不變)
         function loadFoodLog() {
-            todayFoods = JSON.parse(localStorage.getItem('todayFoods') || '[]').map(f => ({
-                id: f.id, name: f.name, en: f.en || '', 
-                cal: f.cal, protein: f.protein || 0, fat: f.fat || 0, carbs: f.carbs || 0,
-                grams: f.grams || 0
-            }));
+            todayFoods = JSON.parse(localStorage.getItem('todayFoods') || '[]');
         }
 
-        // 9. Update Dashboard (Profile/Dashboard 整合)
         function updateDashboard() {
-            // 🚨 PROFILE 整合：載入 TDEE，如果沒有則提示
-            let tdee = parseFloat(localStorage.getItem('tdee')); 
+            let tdee = parseFloat(localStorage.getItem('tdee')) || 2000;
+            document.getElementById('target-cal').textContent = tdee;
+
+            const total = todayFoods.reduce((acc, f) => ({
+                cal: acc.cal + f.cal,
+                p: acc.p + f.p,
+                f: acc.f + f.f,
+                c: acc.c + f.c
+            }), { cal: 0, p: 0, f: 0, c: 0 });
+
+            document.getElementById('current-cal').textContent = total.cal.toFixed(1);
             
-            if (isNaN(tdee) || tdee === 0) {
-                tdee = 2000; // 預設值
-                document.getElementById('target-cal').textContent = '--';
-                document.getElementById('status-text').textContent = "(Set TDEE in Profile!)";
-                document.getElementById('status-text').style.color = "orange";
+            const pct = Math.min(100, (total.cal / tdee) * 100);
+            const bar = document.getElementById('progress-bar');
+            const status = document.getElementById('status-text');
+            
+            bar.style.width = pct + "%";
+            
+            if (total.cal > tdee) {
+                bar.style.backgroundColor = "var(--danger-color)";
+                status.textContent = "Over";
+                status.style.color = "var(--danger-color)";
             } else {
-                document.getElementById('target-cal').textContent = tdee.toFixed(0);
-            }
-            
-            const displayTotal = document.getElementById('current-cal');
-            const targetDisplay = document.getElementById('target-cal');
-            const progressBar = document.getElementById('progress-bar');
-            const statusText = document.getElementById('status-text');
-
-            const totalCal = todayFoods.reduce((acc, f) => acc + f.cal, 0);
-            const totalProtein = todayFoods.reduce((acc, f) => acc + (f.protein || 0), 0);
-            const totalFat = todayFoods.reduce((acc, f) => acc + (f.fat || 0), 0);
-            const totalCarbs = todayFoods.reduce((acc, f) => acc + (f.carbs || 0), 0);
-
-
-            displayTotal.textContent = totalCal.toFixed(1);
-            
-            const pct = Math.min(100, (totalCal / tdee) * 100);
-            progressBar.style.width = pct + "%";
-            
-            if(totalCal > tdee) {
-                statusText.textContent = "(Surplus ⚠️)";
-                statusText.style.color = "red";
-                progressBar.style.background = "red";
-            } else {
-                statusText.textContent = "(On Track)";
-                statusText.style.color = "green";
-                progressBar.style.background = "#e67e22";
+                bar.style.backgroundColor = "var(--success-color)";
+                status.textContent = "On Track";
+                status.style.color = "var(--success-color)";
             }
 
-            foodLog.innerHTML = '';
+            const list = document.getElementById('food-log');
+            list.innerHTML = '';
+            
             if (todayFoods.length === 0) {
-                foodLog.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px;">No food logged yet.</div>';
+                list.innerHTML = '<p style="text-align:center; color:#999; padding:10px;">No logs today.</p>';
             } else {
-                 todayFoods.forEach(f => {
-                    const div = document.createElement('div');
-                    div.className = 'food-list-item';
-                    
-                    const displayName = `${f.name} ${f.en ? `(${f.en})` : ''}`;
-
-                    const logNutrition = `
-                        <div class="nutrition-detail">
-                            Portion: ${f.grams.toFixed(0)}g | P: ${f.protein.toFixed(1)}g | F: ${f.fat.toFixed(1)}g | C: ${f.carbs.toFixed(1)}g
-                        </div>
-                    `;
-
-                    div.innerHTML = `
+                todayFoods.forEach(f => {
+                    const item = document.createElement('div');
+                    item.className = 'food-list-item';
+                    item.innerHTML = `
                         <div>
-                            <div style="font-weight:bold;">${displayName}</div>
-                            ${logNutrition}
+                            <strong>${f.name}</strong> <small>(${f.grams}g)</small><br>
+                            <span class="nutrition-detail">${f.cal.toFixed(1)} kcal</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="color:#e67e22; font-weight:bold;">${f.cal.toFixed(1)} kcal</span>
-                            <button class="danger-btn small" onclick="deleteFood(${f.id})" style="padding:2px 8px;">×</button>
-                        </div>`;
-                    foodLog.appendChild(div);
+                        <button class="danger-btn small" onclick="deleteFood(${f.id})">×</button>
+                    `;
+                    list.appendChild(item);
                 });
             }
 
-            // 🚨 DASHBOARD 整合：儲存當日總結數據
-            const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-            const dailySummary = {
-                calories: totalCal.toFixed(1),
-                protein: totalProtein.toFixed(1),
-                fat: totalFat.toFixed(1),
-                carbs: totalCarbs.toFixed(1),
-                tdee: tdee.toFixed(0),
-                isComplete: totalCal > 0 ? true : false
+            // Save summary for dashboard
+            const today = new Date().toISOString().slice(0, 10);
+            const summary = {
+                calories: total.cal.toFixed(1),
+                protein: total.p.toFixed(1),
+                fat: total.f.toFixed(1),
+                carbs: total.c.toFixed(1)
             };
-            localStorage.setItem(`dietSummary_${today}`, JSON.stringify(dailySummary));
+            localStorage.setItem(`dietSummary_${today}`, JSON.stringify(summary));
         }
-        
     </script>
 </body>
 </html>

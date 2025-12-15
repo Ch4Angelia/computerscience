@@ -1,98 +1,131 @@
 /* =========================================
-   1. 全域設定 (Global Styles)
+   1. 全域設定 (Global & Layout)
    ========================================= */
+:root {
+    --primary-color: #4a90e2;       /* 主色調：清爽藍 */
+    --primary-dark: #357abd;        /* 深藍 (Hover用) */
+    --accent-color: #e67e22;        /* 強調色：橙 (卡路里/警告) */
+    --success-color: #2ecc71;       /* 成功色：綠 */
+    --danger-color: #e74c3c;        /* 危險色：紅 */
+    --bg-color: #f4f7f6;            /* 背景灰 */
+    --card-bg: #ffffff;             /* 卡片白 */
+    --text-color: #333333;          /* 文字黑 */
+    --border-radius: 12px;          /* 圓角 */
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* 陰影 */
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
-    background-color: #f0f2f5; /* 柔和背景色 */
-    color: #333;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
 }
 
-/* 容器樣式 - 適用於所有頁面 */
+/* 核心容器：限制寬度，模擬 App 質感 */
 .container {
     width: 100%;
-    max-width: 600px; /* 限制最大寬度，手機電腦都好看 */
+    max-width: 600px;
+    margin: 20px auto 80px auto; /* 底部留白 */
     padding: 20px;
-    margin: 20px auto;
-    background: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
+    box-sizing: border-box;
 }
 
 /* 標題樣式 */
-h1, h2, h3 {
+h2 {
+    color: var(--primary-color);
     text-align: center;
-    color: #1877f2;
-    margin-bottom: 20px;
+    font-weight: 600;
+    border-bottom: 2px solid #e1e8ed;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
 }
 
-h2 {
-    border-bottom: 2px solid #e7f3ff;
-    padding-bottom: 10px;
+h3 {
+    color: #555;
+    margin-top: 0;
+    font-size: 1.1em;
+}
+
+/* 卡片元件 */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,0.02);
 }
 
 /* =========================================
-   2. 導航列 (Sidenav) & Header
+   2. 導航列與側邊欄 (Sidenav)
    ========================================= */
 .header-bar {
     width: 100%;
-    padding: 15px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background: var(--card-bg);
+    padding: 15px 20px;
     position: sticky;
     top: 0;
-    z-index: 5;
+    z-index: 50;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .menu-icon {
-    font-size: 30px;
+    font-size: 28px;
     cursor: pointer;
-    color: #333;
-    margin-left: 10px;
+    color: var(--text-color);
+    transition: color 0.2s;
 }
+.menu-icon:hover { color: var(--primary-color); }
 
+/* 側邊欄樣式 */
 .sidenav {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 100; /* 確保在最上層 */
+    z-index: 100; /* 最高層級 */
     top: 0;
     left: 0;
-    background-color: #111;
+    background-color: #2c3e50; /* 深色背景 */
     overflow-x: hidden;
-    transition: 0.5s;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     padding-top: 60px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.3);
 }
 
 .sidenav a {
-    padding: 8px 8px 8px 32px;
+    padding: 12px 20px 12px 30px;
     text-decoration: none;
     font-size: 18px;
-    color: #818181;
+    color: #ecf0f1;
     display: block;
     transition: 0.3s;
+    border-left: 4px solid transparent;
 }
 
 .sidenav a:hover {
-    color: #f1f1f1;
+    color: #fff;
+    background-color: rgba(255,255,255,0.1);
+    border-left-color: var(--primary-color);
 }
 
 .sidenav .closebtn {
     position: absolute;
-    top: 0;
-    right: 25px;
+    top: 10px;
+    right: 20px;
     font-size: 36px;
-    margin-left: 50px;
+    margin-left: 0;
+    color: #fff;
 }
 
+/* 遮罩層 */
 #overlay {
     position: fixed;
     display: none;
@@ -104,256 +137,232 @@ h2 {
     bottom: 0;
     background-color: rgba(0,0,0,0.5);
     z-index: 99;
+    backdrop-filter: blur(2px);
     cursor: pointer;
 }
 
 /* =========================================
-   3. 通用元件 (Card, Button, Input)
+   3. 互動元件 (Button, Input, Form)
    ========================================= */
-.card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #e1e3e7;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-}
-
-/* 輸入框 */
-input[type="text"], 
-input[type="number"], 
-select {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-size: 16px;
-}
-
 /* 按鈕 */
 button {
     cursor: pointer;
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: opacity 0.3s;
+    border-radius: 8px;
+    font-size: 15px;
     font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
-button:active {
-    transform: scale(0.98);
+button:active { transform: translateY(1px); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.primary-btn { background-color: var(--primary-color); color: white; }
+.primary-btn:hover { background-color: var(--primary-dark); }
+
+.secondary { background-color: #95a5a6; color: white; }
+.secondary:hover { background-color: #7f8c8d; }
+
+.danger-btn { background-color: var(--danger-color); color: white; }
+.danger-btn:hover { background-color: #c0392b; }
+
+.small { padding: 6px 12px; font-size: 0.85em; }
+
+/* 輸入框 */
+input[type="text"], 
+input[type="number"], 
+input[type="datetime-local"],
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #fcfcfc;
+    transition: border-color 0.2s;
 }
 
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    background-color: #fff;
 }
 
-.primary-btn {
-    background-color: #1877f2;
-    color: white;
-}
-
-.danger-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.small {
-    padding: 5px 10px !important;
-    font-size: 0.85em;
-}
+.form-group { margin-bottom: 5px; }
+.form-group label { display: block; font-weight: 600; color: #555; margin-bottom: 5px; text-align: left;}
 
 /* Toast 通知 */
 #toast {
     visibility: hidden;
     min-width: 250px;
-    margin-left: -125px;
     background-color: #333;
     color: #fff;
     text-align: center;
-    border-radius: 4px;
-    padding: 16px;
+    border-radius: 50px;
+    padding: 12px 20px;
     position: fixed;
-    z-index: 101;
+    z-index: 200;
     left: 50%;
     bottom: 30px;
-    font-size: 17px;
+    transform: translateX(-50%);
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-
-#toast.show {
-    visibility: visible;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+#toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
 /* =========================================
-   4. Diet Tracker 特定樣式
+   4. 特殊頁面樣式
    ========================================= */
+
+/* --- Dashboard (Index) --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.stat-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 1px solid #eee;
+}
+.stat-number {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 10px 0;
+}
+
+/* --- Diet Tracker --- */
 .progress-container {
     background-color: #e0e0e0;
-    border-radius: 10px;
-    height: 15px;
+    border-radius: 20px;
+    height: 12px;
     width: 100%;
-    margin-top: 10px;
     overflow: hidden;
+    margin-top: 5px;
 }
-
 .progress-bar {
-    background-color: #2ecc71; /* Green */
+    background-color: var(--success-color);
     height: 100%;
     width: 0%;
-    border-radius: 10px;
-    transition: width 0.4s ease;
+    border-radius: 20px;
+    transition: width 0.5s ease;
 }
-
 .food-list-item {
+    padding: 12px;
+    border-bottom: 1px dashed #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    border-bottom: 1px dashed #eee;
-    background-color: #fff;
-    transition: background-color 0.2s;
 }
-
-.food-list-item:hover {
-    background-color: #f9f9f9;
-}
-
-.nutrition-detail {
-    font-size: 0.85em;
-    color: #777;
-    margin-top: 4px;
-}
-
-.update-db-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
+.nutrition-detail { font-size: 0.8em; color: #777; margin-top: 2px; }
 .loading-spinner {
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid white;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid #fff;
     border-radius: 50%;
-    width: 14px;
-    height: 14px;
+    width: 14px; height: 14px;
     animation: spin 1s linear infinite;
     display: inline-block;
-    margin-right: 5px;
 }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* =========================================
-   5. Water Tracker 特定樣式 (修復水杯不見的問題)
-   ========================================= */
-/* 大水杯 */
+/* --- Water Tracker --- */
+.cup-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
 .cup {
     background-color: #fff;
-    border: 4px solid #144fc6;
-    color: #144fc6;
+    border: 4px solid var(--primary-color);
+    color: var(--primary-color);
     border-radius: 0 0 40px 40px;
     height: 330px;
     width: 150px;
-    margin: 30px auto;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    position: relative; /* 讓內部定位正常 */
+    position: relative;
 }
-
-.cup.cup-small {
-    height: 95px;
-    width: 50px;
+.cup .water {
+    background-color: #6ab3f8;
+    width: 100%;
+    transition: height 0.3s ease;
+    position: absolute;
+    bottom: 0;
+}
+.cup .remained {
+    position: absolute;
+    top: 50px;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+}
+.cups {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.cup-small {
+    height: 95px; width: 50px;
     border-radius: 0 0 15px 15px;
     background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--primary-color);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    margin: 5px;
-    transition: 0.3s ease;
+    transition: 0.2s;
 }
-
-.cup.cup-small.full {
+.cup-small.full {
     background-color: #6ab3f8;
     color: #fff;
 }
 
-.remained {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    flex: 1;
-    transition: 0.3s ease;
+/* --- Walking & Stairs --- */
+.action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 20px 0;
 }
-
-.remained span {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.remained small {
-    font-size: 12px;
-}
-
-.percentage {
-    background-color: #6ab3f8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 30px;
-    height: 0;
-    transition: 0.3s ease;
-    width: 100%;
-    color: white;
-}
-
-.text {
-    text-align: center;
-    margin: 0 0 5px;
-}
-
-/* 小水杯容器 */
-.cups {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    width: 280px;
-    margin: 0 auto;
-}
-
-/* =========================================
-   6. 其他頁面支援 (Profile, Exercise等)
-   ========================================= */
-.info-box {
-    background-color: #e7f3ff;
-    border: 1px solid #1877f2;
+.action-card {
+    background: #fff;
     padding: 15px;
-    border-radius: 6px;
-    margin-top: 20px;
+    border-radius: 8px;
     text-align: center;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
+/* --- Timer --- */
+.timer-display {
+    font-size: 3.5em;
     font-weight: bold;
-    color: #555;
+    text-align: center;
+    color: var(--text-color);
+    font-family: 'Courier New', monospace;
+    margin: 20px 0;
 }
+
+/* --- Animations --- */
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+/* Badge */
+.badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+.badge.ok { background: #e8f5e9; color: #2ecc71; }
+.badge.warn { background: #fff3e0; color: #f39c12; }
