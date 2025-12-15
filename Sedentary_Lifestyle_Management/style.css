@@ -1,37 +1,69 @@
+/* =========================================
+   1. 全域設定 (Global Styles)
+   ========================================= */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    /* 視覺優化: 更柔和的背景色 */
-    background-color: #f0f2f5; 
+    background-color: #f0f2f5; /* 柔和背景色 */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 }
 
-/* 視覺優化: 容器居中、圓角和陰影 */
+/* 容器樣式 - 適用於所有頁面 */
 .container {
-    max-width: 600px; /* 限制最大寬度 */
-    padding: 30px;
+    width: 100%;
+    max-width: 600px; /* 限制最大寬度，手機電腦都好看 */
+    padding: 20px;
+    margin: 20px auto;
     background: #ffffff;
-    border-radius: 12px; /* 圓角更明顯 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 柔和陰影 */
-    /* 讓容器在頁面中居中 */
-    margin: 20px auto 0 auto !important; 
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
 }
 
-/* 視覺優化: 標題樣式 */
+/* 標題樣式 */
+h1, h2, h3 {
+    text-align: center;
+    color: #1877f2;
+    margin-bottom: 20px;
+}
+
 h2 {
-    color: #1877f2; /* 藍色強調 */
     border-bottom: 2px solid #e7f3ff;
     padding-bottom: 10px;
-    margin-bottom: 20px;
-    font-weight: 600;
 }
 
-/* 導航列樣式 */
+/* =========================================
+   2. 導航列 (Sidenav) & Header
+   ========================================= */
+.header-bar {
+    width: 100%;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    font-size: 30px;
+    cursor: pointer;
+    color: #333;
+    margin-left: 10px;
+}
+
 .sidenav {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 10;
+    z-index: 100; /* 確保在最上層 */
     top: 0;
     left: 0;
     background-color: #111;
@@ -71,100 +103,50 @@ h2 {
     right: 0;
     bottom: 0;
     background-color: rgba(0,0,0,0.5);
-    z-index: 9;
+    z-index: 99;
     cursor: pointer;
 }
 
-.header-bar {
-    padding: 15px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.menu-icon {
-    font-size: 30px;
-    cursor: pointer;
-    color: #333;
-}
-
-/* 視覺優化: 卡片樣式 */
+/* =========================================
+   3. 通用元件 (Card, Button, Input)
+   ========================================= */
 .card {
-    background-color: #f9fbfd; /* 卡片內部輕微色 */
-    padding: 15px;
-    border-radius: 8px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
     border: 1px solid #e1e3e7;
-    box-shadow: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     margin-bottom: 20px;
 }
 
-.progress-container {
-    background-color: #ddd;
-    border-radius: 5px;
-    margin-top: 10px;
-    height: 10px;
-}
-
-.progress-bar {
-    height: 10px;
-    background-color: #e67e22; /* Primary color */
-    border-radius: 5px;
-    width: 0%;
-    transition: width 0.5s;
-}
-
-/* Toast Notification */
-#toast {
-    visibility: hidden;
-    min-width: 250px;
-    margin-left: -125px;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 2px;
-    padding: 16px;
-    position: fixed;
-    z-index: 100;
-    left: 50%;
-    bottom: 30px;
-    font-size: 17px;
-    white-space: nowrap;
-}
-
-#toast.show {
-    visibility: visible;
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-@-webkit-keyframes fadein {
-    from {bottom: 0; opacity: 0;} 
-    to {bottom: 30px; opacity: 1;}
-}
-
-@keyframes fadein {
-    from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
-}
-
-@-webkit-keyframes fadeout {
-    from {bottom: 30px; opacity: 1;} 
-    to {bottom: 0; opacity: 0;}
-}
-
-@keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
-    to {bottom: 0; opacity: 0;}
-}
-
-/* --- 按鈕樣式 (使用新的設計) --- */
-button {
-    padding: 8px 15px;
-    border: none;
+/* 輸入框 */
+input[type="text"], 
+input[type="number"], 
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
     border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+/* 按鈕 */
+button {
     cursor: pointer;
-    transition: background-color 0.3s, opacity 0.3s;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: opacity 0.3s;
     font-weight: 500;
 }
+
+button:active {
+    transform: scale(0.98);
+}
+
 button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -174,52 +156,82 @@ button:disabled {
     background-color: #1877f2;
     color: white;
 }
-.primary-btn:hover:not(:disabled) {
-    background-color: #1660c4;
-}
 
 .danger-btn {
-    background-color: #eb4d4b;
+    background-color: #e74c3c;
     color: white;
-}
-.danger-btn:hover:not(:disabled) {
-    background-color: #c4403f;
 }
 
 .small {
     padding: 5px 10px !important;
-    font-size: 0.8em;
+    font-size: 0.85em;
 }
 
-/* 輸入框樣式 */
-input[type="text"], input[type="number"] {
+/* Toast 通知 */
+#toast {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 16px;
+    position: fixed;
+    z-index: 101;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+}
+
+#toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+/* =========================================
+   4. Diet Tracker 特定樣式
+   ========================================= */
+.progress-container {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    height: 15px;
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
+    margin-top: 10px;
+    overflow: hidden;
 }
 
-/* --- 搜尋結果列表樣式 --- */
+.progress-bar {
+    background-color: #2ecc71; /* Green */
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+
 .food-list-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 10px;
+    padding: 12px;
     border-bottom: 1px dashed #eee;
-    background-color: white;
-    cursor: default;
+    background-color: #fff;
     transition: background-color 0.2s;
 }
+
 .food-list-item:hover {
-    background-color: #f0f2f5;
-}
-.nutrition-detail {
-    font-size: 0.8em;
-    color: #666;
+    background-color: #f9f9f9;
 }
 
-/* Update DB 按鈕區域的排版 */
+.nutrition-detail {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 4px;
+}
+
 .update-db-area {
     display: flex;
     align-items: center;
@@ -227,11 +239,6 @@ input[type="text"], input[type="number"] {
     margin-bottom: 15px;
 }
 
-/* --- 載入中動畫 (Loading Spinner) --- */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
 .loading-spinner {
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top: 2px solid white;
@@ -241,5 +248,112 @@ input[type="text"], input[type="number"] {
     animation: spin 1s linear infinite;
     display: inline-block;
     margin-right: 5px;
-    vertical-align: middle;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* =========================================
+   5. Water Tracker 特定樣式 (修復水杯不見的問題)
+   ========================================= */
+/* 大水杯 */
+.cup {
+    background-color: #fff;
+    border: 4px solid #144fc6;
+    color: #144fc6;
+    border-radius: 0 0 40px 40px;
+    height: 330px;
+    width: 150px;
+    margin: 30px auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative; /* 讓內部定位正常 */
+}
+
+.cup.cup-small {
+    height: 95px;
+    width: 50px;
+    border-radius: 0 0 15px 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    font-size: 14px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 5px;
+    transition: 0.3s ease;
+}
+
+.cup.cup-small.full {
+    background-color: #6ab3f8;
+    color: #fff;
+}
+
+.remained {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+    transition: 0.3s ease;
+}
+
+.remained span {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.remained small {
+    font-size: 12px;
+}
+
+.percentage {
+    background-color: #6ab3f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 30px;
+    height: 0;
+    transition: 0.3s ease;
+    width: 100%;
+    color: white;
+}
+
+.text {
+    text-align: center;
+    margin: 0 0 5px;
+}
+
+/* 小水杯容器 */
+.cups {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 280px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   6. 其他頁面支援 (Profile, Exercise等)
+   ========================================= */
+.info-box {
+    background-color: #e7f3ff;
+    border: 1px solid #1877f2;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
 }
