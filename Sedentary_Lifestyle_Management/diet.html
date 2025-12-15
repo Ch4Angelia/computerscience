@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css"> 
     <style>
         .header-bar { background-color: transparent; }
-        /* 樣式優化: 搜尋結果列表 */
+        /* Style optimizations for search results */
         .food-list-item {
             display: flex;
             justify-content: space-between;
@@ -51,7 +51,7 @@
     </div>
 
     <div class="container" style="margin-top: 0;">
-        <h2>🍎 Diet Tracker</h2>
+        <h2>🍎 Daily Diet Tracker</h2>
         
         <div class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
@@ -64,7 +64,7 @@
         <div class="card" style="margin-top: 20px;">
             <h3>🔍 Search & Add Food</h3>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button onclick="alert('更新功能目前已禁用，若需更新資料，請聯繫管理員或在終端機手動執行 Python 腳本。')">⚡ Update DB</button>
+                <button onclick="alert('The update feature is currently disabled. To update the database, please contact the administrator or run the Python script manually in the terminal.')">⚡ Update DB</button>
             </div>
             
             <div class="search-container">
@@ -88,7 +88,7 @@
     </div>
 
     <script>
-        // --- 導航列與通用功能 (維持不變) ---
+        // --- Navigation and General Functions (Messages updated) ---
         function openNav() {
             document.getElementById("mySidenav").style.width = "250px";
             document.getElementById("overlay").style.display = "block";
@@ -106,10 +106,9 @@
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
         
-        // --- 核心飲食追蹤邏輯 ---
+        // --- Core Diet Tracking Logic ---
         
-        // ⚠️ 1. 嵌入式食物資料庫 (請在此處貼上您完整的 JSON 內容！)
-        //    確保格式為：[ { ... }, { ... } ]
+        // ⚠️ 1. EMBEDDED FOOD DATABASE (PASTE YOUR FULL JSON HERE)
         let foodDatabaseRaw = [
     {
         "id": "A0100101",
@@ -24093,30 +24092,28 @@
     }
 ];
 
-        let foodDatabase = []; // 轉換後的食物資料
-        let todayFoods = [];   // 儲存今日已記錄的食物
+        let foodDatabase = [];
+        let todayFoods = [];  
         let foodLog = document.getElementById('food-log');
         let foodSearchResults = document.getElementById('food-search-results');
         let loadingStatus = document.getElementById('loading-status');
 
-        // 頁面載入時執行
         document.addEventListener('DOMContentLoaded', () => {
             processEmbeddedFoodDatabase(); 
             loadFoodLog();
             updateDashboard();
         });
 
-        // 2. 資料庫處理與欄位轉換
+        // 2. Data Processing and Field Mapping (Messages updated)
         function processEmbeddedFoodDatabase() {
-             loadingStatus.textContent = '處理資料中...';
+             loadingStatus.textContent = 'Processing data...';
              
              if (foodDatabaseRaw.length > 0) {
-                 // 將 JSON 欄位名稱 (name, calories) 轉換為程式碼中的 (zh, cal) 格式
                  foodDatabase = foodDatabaseRaw.map(item => ({
                      id: item.id,
-                     zh: item.name,              // 'name' 映射到 'zh' (中文/主要名稱)
-                     en: item.english_name || '', // 'english_name' 映射到 'en'
-                     cal: parseFloat(item.calories) || 0, // 確保為數字
+                     zh: item.name,
+                     en: item.english_name || '',
+                     cal: parseFloat(item.calories) || 0,
                      protein: parseFloat(item.protein) || 0,
                      fat: parseFloat(item.fat) || 0,
                      carbs: parseFloat(item.carbs) || 0,
@@ -24128,13 +24125,13 @@
                  loadingStatus.style.color = 'green';
                  
              } else {
-                 foodSearchResults.innerHTML = `<div style="text-align:center; color:red; margin-top:20px;">🚨 嵌入的資料庫為空！</div>`;
+                 foodSearchResults.innerHTML = `<div style="text-align:center; color:red; margin-top:20px;">🚨 Embedded database is empty!</div>`;
                  loadingStatus.textContent = '🚨 Data Empty';
                  loadingStatus.style.color = 'red';
              }
         }
         
-        // 3. 搜尋函數 (Search Handler)
+        // 3. Search Handler (Messages updated)
         window.filterFood = function() {
             const query = document.getElementById('search-box').value.toLowerCase().trim();
             
@@ -24146,15 +24143,14 @@
             }
 
             const filtered = foodDatabase.filter(food => {
-                // 搜尋中文 (zh) 或 英文 (en) 欄位
                 return (food.zh && food.zh.toLowerCase().includes(query)) ||
                        (food.en && food.en.toLowerCase().includes(query));
             });
 
-            displaySearchResults(filtered.slice(0, 15)); // 只顯示前 15 筆結果
+            displaySearchResults(filtered.slice(0, 15)); 
         }
         
-        // 4. 顯示結果函數
+        // 4. Display Results Function (Messages updated)
         function displaySearchResults(results) {
             foodSearchResults.innerHTML = '';
             
@@ -24167,14 +24163,13 @@
                 const div = document.createElement('div');
                 div.className = 'food-list-item';
                 
-                // 顯示中英文名稱
                 const displayName = `${food.zh} ${food.en ? `(${food.en})` : ''}`;
                 
-                // 顯示詳細營養素 (使用轉換後的欄位)
+                // Display detailed nutrition info
                 const nutritionInfo = `
                     <div class="nutrition-detail">
-                        每 ${food.unit_per_serving}: 
-                        蛋白: ${food.protein.toFixed(1)}g | 脂肪: ${food.fat.toFixed(1)}g | 碳水: ${food.carbs.toFixed(1)}g
+                        Per ${food.unit_per_serving}: 
+                        Protein: ${food.protein.toFixed(1)}g | Fat: ${food.fat.toFixed(1)}g | Carbs: ${food.carbs.toFixed(1)}g
                     </div>
                 `;
                 
@@ -24193,7 +24188,7 @@
             });
         }
 
-        // 5. 記錄食物 (新增三大營養素參數)
+        // 5. Log Food (Toast message updated)
         window.logFood = function(name, cal, protein=0, fat=0, carbs=0) {
             const newId = todayFoods.length > 0 ? Math.max(...todayFoods.map(f => f.id)) + 1 : 1;
             todayFoods.push({ 
@@ -24205,11 +24200,11 @@
                 carbs: carbs 
             });
             localStorage.setItem('todayFoods', JSON.stringify(todayFoods));
-            showToast(`${name} added!`);
+            showToast(`${name} added to log!`);
             updateDashboard();
         }
 
-        // 6. 刪除食物 (維持不變)
+        // 6. Delete Food (Toast message updated)
         window.deleteFood = function(id) {
             todayFoods = todayFoods.filter(f => f.id !== id);
             localStorage.setItem('todayFoods', JSON.stringify(todayFoods));
@@ -24217,9 +24212,9 @@
             updateDashboard();
         }
 
-        // 7. 清除所有食物紀錄 (維持不變)
+        // 7. Clear Food Log (Confirmation and Toast messages updated)
         window.clearFoodLog = function() {
-            if(confirm('Are you sure you want to clear today\'s food log?')) {
+            if(confirm('Are you sure you want to clear today\'s food log? This cannot be undone.')) {
                 todayFoods = [];
                 localStorage.removeItem('todayFoods');
                 showToast('Log Cleared!');
@@ -24227,20 +24222,19 @@
             }
         }
 
-        // 8. 載入今日食物紀錄 (維持不變)
+        // 8. Load Food Log (No user-facing changes)
         function loadFoodLog() {
-            // 確保載入時帶有三大營養素欄位
             todayFoods = JSON.parse(localStorage.getItem('todayFoods') || '[]').map(f => ({
                 id: f.id,
                 name: f.name,
                 cal: f.cal,
-                protein: f.protein || 0, // 如果舊紀錄沒有，設為 0
+                protein: f.protein || 0,
                 fat: f.fat || 0,
                 carbs: f.carbs || 0
             }));
         }
 
-        // 9. 更新儀表板顯示 (維持不變)
+        // 9. Update Dashboard (Status messages updated)
         function updateDashboard() {
             const tdee = parseFloat(localStorage.getItem('tdee') || 2000); 
             
@@ -24250,11 +24244,6 @@
             const statusText = document.getElementById('status-text');
 
             const total = todayFoods.reduce((acc, f) => acc + f.cal, 0);
-            
-            // 計算三大營養素總和 (僅供未來顯示總量使用，此處未顯示在儀表板)
-            const totalProtein = todayFoods.reduce((acc, f) => acc + (f.protein || 0), 0);
-            const totalFat = todayFoods.reduce((acc, f) => acc + (f.fat || 0), 0);
-            const totalCarbs = todayFoods.reduce((acc, f) => acc + (f.carbs || 0), 0);
 
             displayTotal.textContent = total.toFixed(1);
             localStorage.setItem('todayCalories', total);
@@ -24283,7 +24272,6 @@
                 const div = document.createElement('div');
                 div.className = 'food-list-item';
                 
-                // 顯示紀錄中的詳細營養素
                 const logNutrition = `
                     <div class="nutrition-detail">
                         P: ${f.protein.toFixed(1)}g | F: ${f.fat.toFixed(1)}g | C: ${f.carbs.toFixed(1)}g
