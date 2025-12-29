@@ -27,5 +27,5 @@ Access the live application here:
 Use the link https://computerscience-zeta.vercel.app/ to open the website
 
 ---
-**Author**: [Your Name]
-**Student ID**: [Your Student ID]
+**Author**: Jovinna Sujanto Dharmadji
+**Student ID**: 1143544
