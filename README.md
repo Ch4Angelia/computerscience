@@ -5,7 +5,8 @@
 
 ## 🌐 Live Demo
 Access the live application here:
-👉 [**Open Website (GitHub Pages)**](YOUR_GITHUB_PAGES_LINK_HERE)
+👉 [**See The Source Code (GitHub Pages)**](https://github.com/Ch4Angelia/computerscience)
+👉 [**Open Website (Vercel Pages)**](https://computerscience-zeta.vercel.app/)
 
 ## 🚀 Core Features
 1. **📊 Dashboard**: Real-time summary of steps, water, and BMI.
@@ -23,9 +24,7 @@ Access the live application here:
 - **Visualization**: Chart.js for water intake trends.
 
 ## 📂 Instructions
-1. Clone the repository.
-2. Open `index.html` in any modern web browser.
-3. No database setup or server required.
+Use the link https://computerscience-zeta.vercel.app/ to open the website
 
 ---
 **Author**: [Your Name]
